@@ -12,4 +12,4 @@ How to set up:
 - Go to app.py and run the file
 - After the environment has been set up, open your web browser and type "localhost:3000"
 - The webpage will be rendered, upload your image file and click upload
-- The processed image will be given to you. Save it in your prefered location
+- The processed image will be given to you. Save it in your preferred location
