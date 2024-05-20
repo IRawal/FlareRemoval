@@ -1,5 +1,5 @@
 ## Remove streaky lens flare from images
-### To run: python streak_removal.py --image [path to image]
+### To run: python streak_removal.py --image [path to image] --output [path to save processed image]
 
 import argparse
 import cv2
@@ -7,9 +7,10 @@ import numpy as np
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", required=True,
-	help="path to the image file")
+ap.add_argument("-i", "--image", required=True, help="path to the image file")
+ap.add_argument("-o", "--output", required=True, help="path to save the processed image")
 args = vars(ap.parse_args())
+
 # load the image
 image = cv2.imread(args["image"])
 
@@ -30,7 +31,7 @@ edges = cv2.Canny(blurred, 70, 140)
 # Use Hough Probabilistic Line Transform to identify straight edges
 rho = 1
 theta = np.pi/180
-lines = cv2.HoughLinesP(edges, rho, theta, threshold=1, minLineLength=50, maxLineGap=5); 
+lines = cv2.HoughLinesP(edges, rho, theta, threshold=1, minLineLength=50, maxLineGap=5)
 
 # divide image into a 16x16 grid
 height, width = image.shape[:2]
@@ -92,11 +93,6 @@ if streaks is not None:
         x1, y1, x2, y2 = streak[0]
         cv2.line(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-# show streaks
-cv2.imshow("streaks", image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
 # create a blank mask image
 mask = np.zeros(image.shape[:2], dtype=np.uint8)
 
@@ -109,14 +105,8 @@ for line in streaks:
 lines_as_points = [np.array([[x1, y1], [x2, y2]], dtype=np.int32) for x1, y1, x2, y2 in lines[0]]
 mask = cv2.fillPoly(mask, pts=lines_as_points, color=(255))
 
-# show the mask
-cv2.imshow("Mask", mask)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
 # inpaint image
-inpainted = cv2.inpaint( image, mask, 3, cv2.INPAINT_TELEA)
+inpainted = cv2.inpaint(image, mask, 3, cv2.INPAINT_TELEA)
 
-# show results
-cv2.imshow("Inpainted", inpainted)
-cv2.waitKey(0)
+# save the processed image
+cv2.imwrite(args["output"], inpainted)
