@@ -76,7 +76,6 @@ def upload():
                     mime_type = 'application/octet-stream'  # Default binary type
                 
                 # Send the processed image file as a response for download
-                print("processed_path: ", processed_path)
                 return send_file(processed_path, mimetype=mime_type, as_attachment=True)
             else:
                 return f'Error in streak_removal.py: {result.stderr}'
